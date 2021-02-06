@@ -1,0 +1,18 @@
+0
+1
+Janine Hopkins
+janine_hopkins@library.co.uk
+librarian1
+password123
+1
+0
+Elaine Brown
+elaine@library.co.uk
+ebrown
+elaine123
+2
+0
+Josh Maxwell
+josh@library.co.uk
+jmaxwell
+josh0
