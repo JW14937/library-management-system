@@ -5,6 +5,24 @@
 
 int current_user_id;
 
+void print_welcome_message() {
+    printf("\n       .--.                   .---.\n");
+    printf("   .---|__|           .-.     |~~~|\n");
+    printf(".--|===|--|_          |_|     |~~~|--.\n");
+    printf("|  |===|  |'\\     .---!~|  .--|   |--|\n");
+    printf("|==|   |  |.'\\    |===| |--|==|   |  |\n");
+    printf("|==|   |  |\\.'\\   |   | |__|  |   |  |\n");
+    printf("|  |   |  | \\  \\  |===| |==|  |   |  |\n");
+    printf("|  |   |__|  \\.'\\ |   |_|__|  |~~~|__|\n");
+    printf("|  |===|--|   \\.'\\|===|~|--|==|~~~|--|\n");
+    printf("|__|___|__|    \\__|___|_|__|__|___|__|\n");
+
+    printf("\n**************************************\n");
+    printf("  ~  Welcome to the library system  ~  \n");
+    printf("**************************************\n");
+    printf("To quit at any point, type \"q\"\n");
+}
+
 int main() {
 
     if(load_users() != 0) {
@@ -12,10 +30,7 @@ int main() {
         exit(1);
     }
 
-    printf("\n******************************\n");
-    printf("Welcome to the library system\n");
-    printf("******************************\n");
-    printf("To quit at any point, type \"q\"\n");
+    print_welcome_message();
 
     int logged_in = 0; //Boolean
     char user_command[20];
@@ -28,15 +43,19 @@ int main() {
 
         if(logged_in == 0) {
             printf("\nType \"login\" or \"register\": ");
-            scanf("%s", &user_command);
+            scanf("%s", user_command);
 
             if(strcmp(user_command, "login")==0) {
                 if(login_procedure() == 0) logged_in = 1;
-                else continue;
             }
 
             else if(strcmp(user_command, "register")==0) {
-                //register_procedure();
+                if(register_procedure() == 0) {
+                    load_users();
+                    printf("\n******************************************");
+                    printf("\nRegistration successful! You may now log in.");
+                    printf("\n******************************************\n");
+                }
             }
 
             else if(strcmp(user_command, "q")==0) {
@@ -45,7 +64,7 @@ int main() {
             }
 
             else {
-                printf("\nSorry, command \"%s\" not recognised!\n", &user_command);
+                printf("\n>> Error << Sorry, command \"%s\" not recognised!\n", &user_command);
             }
         }
 
@@ -54,7 +73,7 @@ int main() {
 
         if(logged_in == 1) {
             printf("\n\n******************************\n");
-            printf("Hello, %s!\n", &(users[current_user_id].name));
+            printf("  Hello, %s!\n", &(users[current_user_id].name));
             printf("******************************\n\n");
             printf("Here are the options available to you:\n");
             printf("-> To LOG OUT, type \"out\"\n");
@@ -67,7 +86,7 @@ int main() {
                 printf("-> To REMOVE books from the library, type \"remove\"\n");
             }
 
-            scanf("%s", &user_command);
+            scanf("%s", user_command);
 
             if(strcmp(user_command, "out")==0) {
                 current_user_id = -1;
@@ -100,7 +119,7 @@ int main() {
             }
 
             else {
-                printf("\nSorry, command \"%s\" not recognised!\n", &user_command);
+                printf("\n>> Error << Sorry, command \"%s\" not recognised!\n", &user_command);
             }
 
         }

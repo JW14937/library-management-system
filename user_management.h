@@ -16,6 +16,12 @@ extern int nr_of_users;
 extern int current_user_id;
 
 int load_users();
+
 int login_procedure();
 int find_username(char username[30]);
 int compare_password(int user_id, char password[30]);
+
+int register_procedure();
+int only_letters_spaces(char text[50]);
+int no_spaces(char text[50]);
+int at_counter(char text[50]);
