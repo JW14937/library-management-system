@@ -8,7 +8,7 @@ int nr_of_users = 0;
 
 // Loads account data of all users saved in file
 int load_users () {
-    nr_of_users = 0; //Reset in case of re-load
+    nr_of_users = 0; // Reset in case of re-load
 
     FILE *fp;
     fp = fopen("account_data.txt", "r");

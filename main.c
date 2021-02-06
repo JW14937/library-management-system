@@ -1,5 +1,7 @@
 #include "book_management.h"
 #include "user_management.h"
+#include "book_management.h"
+#include "books_additional.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -30,6 +32,12 @@ int main() {
         exit(1);
     }
 
+    FILE *fp;
+    if(load_books(fp) != 0) {
+        printf("Error loading books");
+        exit(1);
+    }
+
     print_welcome_message();
 
     int logged_in = 0; //Boolean
@@ -47,6 +55,9 @@ int main() {
 
             if(strcmp(user_command, "login")==0) {
                 if(login_procedure() == 0) logged_in = 1;
+                printf("\n\n******************************\n");
+                printf("  Hello, %s!\n", &(users[current_user_id].name));
+                printf("******************************\n\n");
             }
 
             else if(strcmp(user_command, "register")==0) {
@@ -72,12 +83,8 @@ int main() {
         /* --- Section for logged in users --- */
 
         if(logged_in == 1) {
-            printf("\n\n******************************\n");
-            printf("  Hello, %s!\n", &(users[current_user_id].name));
-            printf("******************************\n\n");
-            printf("Here are the options available to you:\n");
-            printf("-> To LOG OUT, type \"out\"\n");
-            printf("-> To SEARCH for books, type \"search\"\n");
+            printf("\n-> To LOG OUT, type \"out\"\n");
+            printf("-> To SEARCH and then BORROW books, type \"search\"\n");
             printf("-> To BORROW books, type \"borrow\"\n");
             printf("-> To RETURN books, type \"return\"\n");
 
@@ -94,15 +101,11 @@ int main() {
             }
 
             else if(strcmp(user_command, "search")==0) {
-                //search_procedure();
-            }
-
-            else if(strcmp(user_command, "borrow")==0) {
-                //borrow_procedure();
+                search_procedure();
             }
 
             else if(strcmp(user_command, "return")==0) {
-                //return_procedure();
+                return_procedure();
             }
 
             else if(strcmp(user_command, "add")==0 && users[current_user_id].is_librarian) {
