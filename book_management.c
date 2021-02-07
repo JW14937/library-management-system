@@ -90,10 +90,10 @@ void search_procedure() {
     char answer;
     answer = getchar();
     if(answer == 'y') {
-        printf("\nWhich of the results would you like to borrow? Please type the number: ");
+        printf("\nWhich of the results would you like to borrow? Please type the number (without #): ");
         int result_nr;
         scanf("%d", &result_nr);
-        
+        //result nr
         if(result_nr > 0 && result_nr <= found_books.length) {
             borrow(books_array[result_nr-1], current_user_id);
         }
@@ -114,18 +114,28 @@ int borrow(struct Book book, int user_id) {
         return 1;
     }
 
-    fprintf(fp, "%s\n", book.title);
-    fprintf(fp, "%d\n", user_id);
+    int book_id = find_id_by_title(book.title);
+    if(book_id < 0) {
+        printf("\n>> Error << Book id not found\n");
+        return 1;
+    }
+    books[book_id].copies -= 1;
+
+    fprintf(fp, "%s, %d\n", book.title, user_id);
 
     printf("\n\n --- You have borrowed \"%s\" ---\n", book.title);
-
-    book.copies -= 1;
-    //^ Update?
+    
     fclose(fp);
     return 0;
 }
 
+int find_id_by_title (char title[]) {
+    for(int i=0; i<nr_of_books; i++) {
+        if(strcmp(books[i].title, title)==0) return i;
+    }
 
+    return -1;
+}
 
 
 /* --- Librarian functions --- */

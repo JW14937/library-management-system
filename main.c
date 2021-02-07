@@ -54,10 +54,12 @@ int main() {
             scanf("%s", user_command);
 
             if(strcmp(user_command, "login")==0) {
-                if(login_procedure() == 0) logged_in = 1;
-                printf("\n\n******************************\n");
-                printf("  Hello, %s!\n", &(users[current_user_id].name));
-                printf("******************************\n\n");
+                if(login_procedure() == 0) {
+                    logged_in = 1;
+                    printf("\n\n******************************\n");
+                    printf("  Hello, %s!\n", &(users[current_user_id].name));
+                    printf("******************************\n\n");
+                }
             }
 
             else if(strcmp(user_command, "register")==0) {
@@ -85,7 +87,6 @@ int main() {
         if(logged_in == 1) {
             printf("\n-> To LOG OUT, type \"out\"\n");
             printf("-> To SEARCH and then BORROW books, type \"search\"\n");
-            printf("-> To BORROW books, type \"borrow\"\n");
             printf("-> To RETURN books, type \"return\"\n");
 
             if(users[current_user_id].is_librarian) {
