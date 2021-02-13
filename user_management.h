@@ -22,6 +22,7 @@ int find_username(char username[30]);
 int compare_password(int user_id, char password[30]);
 
 int register_procedure();
-int only_letters_spaces(char text[50]);
-int no_spaces(char text[50]);
-int at_counter(char text[50]);
+int only_letters_spaces(char text[50]); //Check that string contains only letters and spaces
+int no_spaces(char text[50]); //Check than string has no spaces
+int at_counter(char text[50]); //Count how many '@' in string
+int not_empty(char text[100]);

@@ -22,7 +22,6 @@ void print_welcome_message() {
     printf("\n**************************************\n");
     printf("  ~  Welcome to the library system  ~  \n");
     printf("**************************************\n");
-    printf("To quit at any point, type \"q\"\n");
 }
 
 int main() {
@@ -50,7 +49,8 @@ int main() {
         /* --- Section for logged out users --- */
 
         if(logged_in == 0) {
-            printf("\nType \"login\" or \"register\": ");
+            printf("\nTo SAVE and QUIT, type \"q\"\n");
+            printf("Type \"login\" or \"register\": ");
             scanf("%s", user_command);
 
             if(strcmp(user_command, "login")==0) {
@@ -58,7 +58,7 @@ int main() {
                     logged_in = 1;
                     printf("\n\n******************************\n");
                     printf("  Hello, %s!\n", &(users[current_user_id].name));
-                    printf("******************************\n\n");
+                    printf("******************************\n");
                 }
             }
 
@@ -85,9 +85,10 @@ int main() {
         /* --- Section for logged in users --- */
 
         if(logged_in == 1) {
-            printf("\n-> To LOG OUT, type \"out\"\n");
+            printf("\n-> To SAVE and QUIT, type \"q\"\n");
+            printf("-> To LOG OUT, type \"out\"\n");
             printf("-> To SEARCH and then BORROW books, type \"search\"\n");
-            printf("-> To RETURN books, type \"return\"\n");
+            printf("-> To see BORROWED books and RETURN them, type \"return\"\n");
 
             if(users[current_user_id].is_librarian) {
                 printf("-> To ADD books to the library, type \"add\"\n");
@@ -110,7 +111,7 @@ int main() {
             }
 
             else if(strcmp(user_command, "add")==0 && users[current_user_id].is_librarian) {
-                //add_procedure();
+                add_procedure();
             }
 
             else if(strcmp(user_command, "remove")==0 && users[current_user_id].is_librarian) {

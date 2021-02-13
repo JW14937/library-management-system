@@ -2,11 +2,23 @@ Crime and Punishment
 Fyodor Dostoevsky
 1866
 10
-A Test Book
-Meg Parker, James Smith
-2020
-5
-A Test Book 2
-Meg Parker, James Smith
-2022
+Oryx and Crake
+Margaret Atwood
+2004
 3
+Lives of the Monster Dogs
+Kirsten Bakis
+1998
+55
+Pride and Prejudice
+Jane Austen
+1813
+25
+Dune
+Frank Herbert
+1965
+2
+Interview with the Vampire
+Anne Rice
+1976
+15

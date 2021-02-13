@@ -51,7 +51,7 @@ int login_procedure() {
     }
 
     char password[30];
-    printf("Enter password: ");
+    printf("\nEnter password: ");
     scanf("%s", &password);
 
     if(compare_password(user_id, password) != 0) {
@@ -199,4 +199,12 @@ int at_counter (char text[50]) {
     }
 
     return counter;
+}
+
+int not_empty (char text[100]) {
+    for(int i=0; i<strlen(text); i++) {
+        if(text[i] != ' ') { return 0; }
+    }
+
+    return 1;
 }
