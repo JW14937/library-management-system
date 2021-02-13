@@ -8,20 +8,10 @@
 int current_user_id;
 
 void print_welcome_message() {
-    printf("\n       .--.                   .---.\n");
-    printf("   .---|__|           .-.     |~~~|\n");
-    printf(".--|===|--|_          |_|     |~~~|--.\n");
-    printf("|  |===|  |'\\     .---!~|  .--|   |--|\n");
-    printf("|==|   |  |.'\\    |===| |--|==|   |  |\n");
-    printf("|==|   |  |\\.'\\   |   | |__|  |   |  |\n");
-    printf("|  |   |  | \\  \\  |===| |==|  |   |  |\n");
-    printf("|  |   |__|  \\.'\\ |   |_|__|  |~~~|__|\n");
-    printf("|  |===|--|   \\.'\\|===|~|--|==|~~~|--|\n");
-    printf("|__|___|__|    \\__|___|_|__|__|___|__|\n");
-
     printf("\n**************************************\n");
     printf("  ~  Welcome to the library system  ~  \n");
     printf("**************************************\n");
+    printf("To QUIT at any point, type \"q\"\n");
 }
 
 int main() {
@@ -49,8 +39,7 @@ int main() {
         /* --- Section for logged out users --- */
 
         if(logged_in == 0) {
-            printf("\nTo SAVE and QUIT, type \"q\"\n");
-            printf("Type \"login\" or \"register\": ");
+            printf("\nType \"login\" or \"register\": ");
             scanf("%s", user_command);
 
             if(strcmp(user_command, "login")==0) {
@@ -85,15 +74,15 @@ int main() {
         /* --- Section for logged in users --- */
 
         if(logged_in == 1) {
-            printf("\n-> To SAVE and QUIT, type \"q\"\n");
-            printf("-> To LOG OUT, type \"out\"\n");
-            printf("-> To SEARCH and then BORROW books, type \"search\"\n");
+            printf("\n-> To SEARCH and then BORROW books, type \"search\"\n");
             printf("-> To see BORROWED books and RETURN them, type \"return\"\n");
 
             if(users[current_user_id].is_librarian) {
                 printf("-> To ADD books to the library, type \"add\"\n");
                 printf("-> To REMOVE books from the library, type \"remove\"\n");
             }
+
+            printf("-> To LOG OUT, type \"out\"\n");
 
             scanf("%s", user_command);
 

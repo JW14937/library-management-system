@@ -26,7 +26,6 @@ int load_users () {
         else if(i == 5) strcpy(users[nr_of_users].username, line);
         else if(i == 6) strcpy(users[nr_of_users].password, line);
         
-        
         i += 1;
         if(i > 6) {
             i = 1;
@@ -120,6 +119,11 @@ int register_procedure() {
         return(1);
     }
 
+    if(email_exists(email)) {
+        printf("\n>> Error << User with this email address already exists\n");
+        return(1);
+    }
+
     /* --- Username --- */
 
     char username[30];
@@ -134,6 +138,10 @@ int register_procedure() {
     if(!no_spaces(username)) {
         printf("\n>> Error << Username cannot contain spaces\n");
         return(1);
+    }
+
+    if(username_exists(username)) {
+        printf("\n>> Error << User \"%s\" already exists!\n", username);
     }
 
     /* --- Password --- */
@@ -172,6 +180,20 @@ int register_procedure() {
     return 0;
 }
 
+int email_exists(char text[50]) {
+    for(int i=0; i<nr_of_users; i++) {
+        if(strcmp(text, users[i].email) == 0) { return 1; }
+    }
+    return 0;
+}
+
+int username_exists (char text[50]) {
+    for(int i=0; i<nr_of_users; i++) {
+        if(strcmp(text, users[i].username) == 0) { return 1; }
+    }
+    return 0;
+}
+
 int only_letters_spaces (char text[50]) {
     for(int i=0; i<strlen(text); i++) {
         if(!(isalpha(text[i]) || text[i] == ' ')) {
@@ -199,12 +221,4 @@ int at_counter (char text[50]) {
     }
 
     return counter;
-}
-
-int not_empty (char text[100]) {
-    for(int i=0; i<strlen(text); i++) {
-        if(text[i] != ' ') { return 0; }
-    }
-
-    return 1;
 }

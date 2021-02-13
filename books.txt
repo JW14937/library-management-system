@@ -22,3 +22,11 @@ Interview with the Vampire
 Anne Rice
 1976
 15
+New Book
+Author 2
+1913
+3
+New Book 1
+Author 2
+1976
+5

@@ -99,14 +99,89 @@ struct BookArray find_book_by_title (const char *title) {
     return found_books;
 }
 
+struct BookArray find_book_by_author (const char *author) {
+
+    struct BookArray found_books;
+    found_books.array = found_books_array;
+    found_books.length = 0;
+
+    // Turn search author into lowercase, to make the search lower/uppercase independent
+    char search_author_lcase[strlen(author)];
+    for(int i=0; i<=strlen(author); i++) {
+        if(author[i] >= 65 && author[i] <= 90) search_author_lcase[i] = author[i]+('a'-'A');
+        else search_author_lcase[i] = author[i];
+    }
+
+    for(int i=0; i<nr_of_books; i++) {
+
+        // Turn compare author into lowercase
+        char full_author_lcase[strlen(books[i].authors)];
+        for(int j=0; j<=strlen(books[i].authors); j++) {
+            if(books[i].authors[j] >= 65 && books[i].authors[j] <= 90) full_author_lcase[j] = books[i].authors[j]+('a'-'A');
+            else full_author_lcase[j] = books[i].authors[j];
+        }
+
+        if(strstr(full_author_lcase, search_author_lcase) != NULL) {
+            found_books_array[found_books.length] = books[i];
+            found_books.length ++;
+        }
+    }
+
+    return found_books;
+}
+
+struct BookArray find_book_by_year (unsigned int year) {
+
+    struct BookArray found_books;
+    found_books.array = found_books_array;
+    found_books.length = 0;
+
+    for(int i=0; i<nr_of_books; i++) {
+        if(books[i].year == year) {
+            found_books_array[found_books.length] = books[i];
+            found_books.length ++;
+        }
+    }
+
+    return found_books;
+}
+
 void search_procedure() {
 
-    printf("\nSearch by title - Enter search terms: ");
-    char search_terms[50];
-    
-    scanf(" %[^\n]%*c", search_terms);
+    struct BookArray found_books;
 
-    struct BookArray found_books = find_book_by_title(search_terms);
+    printf("\nType \"title\" to search by TITLE, \"author\" to search by AUTHOR, \"year\" to search by YEAR: ");
+    char search_option[20];
+    scanf("%s", search_option);
+    
+    if(strcmp(search_option, "title")==0) {
+        char search_terms[50];
+        printf("\nEnter search term(s): ");
+        scanf(" %[^\n]%*c", search_terms);
+        found_books = find_book_by_title(search_terms);
+    }
+    else if(strcmp(search_option, "author")==0) {
+        char search_terms[50];
+        printf("\nEnter search term(s): ");
+        scanf(" %[^\n]%*c", search_terms);
+        found_books = find_book_by_author(search_terms);
+    }
+    else if(strcmp(search_option, "year")==0) {
+        int search_year;
+        printf("\nEnter search year: ");
+        scanf("%d", &search_year);
+
+        if(search_year < 0) {
+            printf("\n>> Error << Invalid year (must be >0)\n");
+            return;
+        }
+        found_books = find_book_by_year(search_year);
+    }
+    else {
+        printf("\n>> Error << Option not recognised\n");
+        return;
+    }
+    
 
     if(found_books.length==0) {
         printf("\n--- No results match your search ---\n");
@@ -125,6 +200,7 @@ void search_procedure() {
 
     printf("\nWould you like to borrow one of these books? (y/n) ");
     char answer;
+    getchar(); //Get rid of newline from buffer
     answer = getchar();
 
     if(answer == 'y') {
@@ -299,7 +375,6 @@ int return_book(struct Book book, int user_id) {
         // line_nr_to_delete = user id line; line_nr_to_delete+1 = title line
         if(line_count != line_nr_to_delete && line_count != line_nr_to_delete+1) {
             fprintf(fp_buffer, "%s\n", line);
-            printf("Line count: %d, line: %s, to delete: %d\n", line_count, line, line_nr_to_delete);
         }
 
         line_count++;
@@ -343,10 +418,6 @@ void add_procedure() {
         printf("\n>> Error << Book title must be between 1 - 50 characters long!\n");
         return;
     }
-    if(not_empty(potential_title) != 0) {
-        printf("\n>> Error << Book title cannot consist of only space characters!\n");
-        return;
-    }
 
     char potential_author[100];
     printf("\nEnter the author(s) of the new book (max 100 characters): ");
@@ -354,10 +425,6 @@ void add_procedure() {
 
     if(strlen(potential_author) < 3 || strlen(potential_author) > 100) {
         printf("\n>> Error << Authors name must be at between 3 - 100 characters long!\n");
-        return;
-    }
-    if(not_empty(potential_author) != 0) {
-        printf("\n>> Error << Authors field cannot consist of only space characters!\n");
         return;
     }
 
