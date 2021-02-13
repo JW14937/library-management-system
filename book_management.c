@@ -14,10 +14,11 @@ int load_books(FILE *file) {
 
     file = fopen("books.txt", "r");
     if(file == NULL) return 1;
-
+    
     char line[256];
 
     while(fscanf(file, "%[^\n]\n", line) != -1) {
+        
         static int i = 1;
 
         if(i == 1) {
@@ -191,11 +192,12 @@ void search_procedure() {
     printf("\n--- %d search result(s) have been found: ---\n", found_books.length);
 
     for(int i=0; i<found_books.length; i++) {
+        if((*(found_books.array+i)).copies < 1) { continue; } //Don't show books with no available copies
         printf("\nResult #%d: \n", i+1);
-        printf("Title: %s\n", found_books_array[i].title);
-        printf("Author(s): %s\n", found_books_array[i].authors);
-        printf("Year published: %d\n", found_books_array[i].year);
-        printf("Copies available: %d\n", found_books_array[i].copies);
+        printf("Title: %s\n", (*(found_books.array+i)).title);
+        printf("Author(s): %s\n", (*(found_books.array+i)).authors);
+        printf("Year published: %d\n", (*(found_books.array+i)).year);
+        printf("Copies available: %d\n", (*(found_books.array+i)).copies);
     }
 
     printf("\nWould you like to borrow one of these books? (y/n) ");
@@ -221,7 +223,7 @@ void search_procedure() {
 
 int borrow(struct Book book, int user_id) {
 
-    if(book.copies <= 0) {
+    if(book.copies < 1) {
         printf("\n>> Error << Sorry, no copies currently available! Try again later\n");
         return 1;
     }
@@ -405,6 +407,62 @@ int find_id_by_title (char title[]) {
 /* --- Librarian functions --- */
 
 void add_procedure() {
+    printf("\nWould you like to (1) add new copies to an existing title, or (2) add a new title?");
+    printf("\nYour choice (type \"1\" or \"2\"): ");
+    int choice;
+    scanf("%d", &choice);
+    getchar(); //Remove the newline from buffer
+
+    if(choice == 1) { add_more_copies(); }
+    else if(choice == 2) { add_new_book(); }
+    else { printf("\n>> Error << You were supposed to type either \"1\" or \"2\";"); }
+}
+
+void add_more_copies() {
+    printf("\nWhich book do you want to add copies to? Search by title: ");
+
+    char search_terms[50];
+    scanf(" %[^\n]%*c", search_terms);
+    struct BookArray found_books = find_book_by_title(search_terms);
+
+    if(found_books.length == 0) {
+        printf("\n--- No books matching your search were found in the library ---\n");
+        return;
+    }
+    printf("%s", found_books.array->authors);
+
+    for(int i=0; i<found_books.length; i++) {
+        printf("\n\nResult nr #%d", i+1);
+        printf("\nTitle: %s", (*(found_books.array+i)).title);
+        printf("\nAuthor(s): %s", (*(found_books.array+i)).authors);
+        printf("\nYear: %d", (*(found_books.array+i)).year);
+        printf("\nAvailable copies: %d", (*(found_books.array+i)).copies);
+    }
+
+    printf("\n\nWould you like to add more copies of one of these books? (y/n) ");
+    char answer;
+    answer = getchar();
+
+    if(answer == 'y') {
+        printf("\nWhich of the results would you like to add the copies to? Please type the number (without #): ");
+        int result_nr;
+        scanf("%1d", &result_nr);
+        
+        if(result_nr > 0 && result_nr <= found_books.length) {
+            int nr_copies = 0;
+            printf("\nEnter the number of copies to add: ");
+            scanf("%d", &nr_copies);
+            books[find_id_by_title(found_books_array[result_nr-1].title)].copies += nr_copies;
+            FILE* fp1; 
+            store_books(fp1);
+            printf("\n--- Added %d more copies of \"%s\" ---\n", nr_copies, found_books_array[result_nr-1].title);
+        }
+        else { printf("\n>> Error << You were supposed to pick one of the numbers\n"); }
+    }
+
+}
+
+void add_new_book() {
 
     char potential_title[50];
     printf("\nEnter the title of the new book (max 50 characters): ");

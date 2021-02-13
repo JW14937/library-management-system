@@ -11,4 +11,6 @@ void return_procedure(); //Return interface
 int return_book(struct Book book, int user_id);
 
 void add_procedure(); //Add book interface
+void add_more_copies(); //Add more copies to an existing title
+void add_new_book(); //Add a new title
 int title_exists(char title[]); //Returns 1 if book with title provided already exists, 0 otherwise

@@ -21,12 +21,20 @@ Frank Herbert
 Interview with the Vampire
 Anne Rice
 1976
-15
-New Book
-Author 2
-1913
-3
+26
 New Book 1
 Author 2
 1976
 5
+Test Books7
+TEst author
+1888
+10
+Test Books8
+TEst author
+1888
+10
+Title Book7
+Bansh & Hsge
+1999
+10

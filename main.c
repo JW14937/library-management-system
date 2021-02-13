@@ -1,6 +1,5 @@
 #include "book_management.h"
 #include "user_management.h"
-#include "book_management.h"
 #include "books_additional.h"
 #include <stdlib.h>
 #include <string.h>
@@ -20,7 +19,7 @@ int main() {
         printf("Error loading users");
         exit(1);
     }
-
+    
     FILE *fp;
     if(load_books(fp) != 0) {
         printf("Error loading books");
