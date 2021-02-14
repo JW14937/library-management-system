@@ -15,7 +15,8 @@ extern int nr_of_users; //The actual number of registered users, maximum 200
 
 extern int current_user_id; //UserID of currently logged in user
 
-int load_users();
+int load_users(FILE *file); //Loads account data of all users saved in text file
+int store_users(FILE *file);
 
 int login_procedure();
 

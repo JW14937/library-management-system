@@ -5,7 +5,7 @@ Fyodor Dostoevsky
 Oryx and Crake
 Margaret Atwood
 2004
-3
+5
 Lives of the Monster Dogs
 Kirsten Bakis
 1998
@@ -17,24 +17,8 @@ Jane Austen
 Dune
 Frank Herbert
 1965
-2
+5
 Interview with the Vampire
 Anne Rice
 1976
-26
-New Book 1
-Author 2
-1976
 5
-Test Books7
-TEst author
-1888
-10
-Test Books8
-TEst author
-1888
-10
-Title Book7
-Bansh & Hsge
-1999
-10

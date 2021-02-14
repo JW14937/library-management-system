@@ -6,17 +6,16 @@
 struct User users[max_users];
 int nr_of_users = 0;
 
-// Loads account data of all users saved in file
-int load_users () {
-    nr_of_users = 0; // Reset in case of re-load
+int load_users (FILE *file) {
 
-    FILE *fp;
-    fp = fopen("account_data.txt", "r");
-    if(fp == NULL) return 1;
+    nr_of_users = 0;
+
+    file = fopen("account_data.txt", "r");
+    if(file == NULL) return 1;
 
     char line[256];
 
-    while(fscanf(fp, "%[^\n]\n", line) != -1) {
+    while(fscanf(file, "%[^\n]\n", line) != -1) {
         static int i = 1;
 
         if(i == 1) users[nr_of_users].id = atoi(line);
@@ -33,7 +32,27 @@ int load_users () {
         }
     }
 
-    fclose(fp);
+    fclose(file);
+
+    return 0;
+}
+
+int store_users(FILE* file) {
+
+    file = fopen("account_data.txt", "w");
+    if(file == NULL) return 1;
+
+    for(int i=0; i<nr_of_users; i++) {
+        fprintf(file, "%d\n", users[i].id);
+        fprintf(file, "%d\n", users[i].is_librarian);
+        fprintf(file, "%s\n", users[i].name);
+        fprintf(file, "%s\n", users[i].email);
+        fprintf(file, "%s\n", users[i].username);
+        fprintf(file, "%s\n", users[i].password);
+    }
+
+    fclose(file);
+
     return 0;
 }
 
@@ -160,23 +179,17 @@ int register_procedure() {
         return(1);
     }
 
-    /* --- Append to file --- */
+    /* --- Add to array --- */
 
-    FILE *fp;
-    fp = fopen("account_data.txt", "a");
-    if(fp == NULL) {
-        printf("Error opening file");
-        return 1;
-    }
+    users[nr_of_users].id = nr_of_users;
+    users[nr_of_users].is_librarian = 0;
+    strcpy(users[nr_of_users].name, name);
+    strcpy(users[nr_of_users].email, email);
+    strcpy(users[nr_of_users].username, username);
+    strcpy(users[nr_of_users].password, password);
 
-    fprintf(fp, "\n%d", nr_of_users); //id
-    fprintf(fp, "\n%s", "0"); //is_librarian
-    fprintf(fp, "\n%s", name);
-    fprintf(fp, "\n%s", email);
-    fprintf(fp, "\n%s", username);
-    fprintf(fp, "\n%s", password);
+    nr_of_users++;
 
-    fclose(fp);
     return 0;
 }
 
