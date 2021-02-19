@@ -6,7 +6,7 @@
 
 int current_user_id;
 
-void print_welcome_message() {
+static void print_welcome_message() {
     printf("\n**************************************\n");
     printf("  ~  Welcome to the library system  ~  \n");
     printf("**************************************\n");
@@ -17,17 +17,43 @@ int main() {
     FILE *fp;
 
     if(load_users(fp) != 0) {
-        printf("Error loading users");
-        exit(1);
+
+        // File not created yet - add admin account
+
+        users[0].id = 0;
+        users[0].is_librarian = 1;
+        strcpy(users[0].name, "Janine Hopkins");
+        strcpy(users[0].email, "janine_hopkins@library.co.uk");
+        strcpy(users[0].username, "librarian1");
+        strcpy(users[0].password, "Password123");
+
+        nr_of_users = 1;
     }
+
     if(load_books(fp) != 0) {
-        printf("Error loading books");
-        exit(1);
+
+        // File not created yet - add starter books
+
+        // Crime and Punishment
+        books[0].title = (char*)malloc(strlen("Crime and Punishment") * sizeof(char));
+        strcpy(books[0].title, "Crime and Punishment");
+        books[0].authors = (char*)malloc(strlen("Fyodor Dostoevsky") * sizeof(char));
+        strcpy(books[0].authors, "Fyodor Dostoevsky");
+        books[0].year = 1866;
+        books[0].copies = 15;
+
+        // Dune
+        books[1].title = (char*)malloc(strlen("Dune") * sizeof(char));
+        strcpy(books[1].title, "Dune");
+        books[1].authors = (char*)malloc(strlen("Frank Herbert") * sizeof(char));
+        strcpy(books[1].authors, "Frank Herbert");
+        books[1].year = 1965;
+        books[1].copies = 20;
+
+        nr_of_books = 2;
     }
-    if(load_loans(fp) != 0) {
-        printf("Error loading loans");
-        exit(1);
-    }
+    
+    load_loans(fp);
 
     print_welcome_message();
 
@@ -44,7 +70,9 @@ int main() {
             printf("\n--- You are logged out ---");
             printf("\nType \"q\" to quit the system");
             printf("\nType \"login\" or \"register\": ");
-            scanf("%s", user_command);
+            
+            fgets(user_command, 20, stdin);
+            user_command[strcspn(user_command, "\n")] = 0;
 
             if(strcmp(user_command, "login")==0) {
                 if(login_procedure() == 0) {
@@ -87,7 +115,8 @@ int main() {
 
             printf("-> To LOG OUT and SAVE, type \"out\"\n");
 
-            scanf("%s", user_command);
+            fgets(user_command, 20, stdin);
+            user_command[strcspn(user_command, "\n")] = 0;
 
             if(strcmp(user_command, "search")==0) {
                 search_procedure();

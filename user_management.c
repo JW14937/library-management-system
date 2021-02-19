@@ -13,9 +13,10 @@ int load_users (FILE *file) {
     file = fopen("account_data.txt", "r");
     if(file == NULL) return 1;
 
-    char line[256];
+    char line[100];
 
-    while(fscanf(file, "%[^\n]\n", line) != -1) {
+    while(fgets(line, 100, file) != NULL) {
+        line[strcspn(line, "\n")] = 0;
         static int i = 1;
 
         if(i == 1) users[nr_of_users].id = atoi(line);
@@ -59,7 +60,9 @@ int store_users(FILE* file) {
 int login_procedure() {
     char username[30];
     printf("\nEnter username: ");
-    scanf("%s", &username);
+
+    fgets(username, 30, stdin);
+    username[strcspn(username, "\n")] = 0;
 
     int user_id = find_username(username);
 
@@ -70,7 +73,8 @@ int login_procedure() {
 
     char password[30];
     printf("\nEnter password: ");
-    scanf("%s", &password);
+    fgets(password, 30, stdin);
+    password[strcspn(password, "\n")] = 0;
 
     if(compare_password(user_id, password) != 0) {
         printf("\n>> Error << Wrong password!\n");
@@ -104,8 +108,9 @@ int register_procedure() {
 
     char name[30];
     printf("\nEnter your name (max. 30 characters): ");
-    scanf(" %[^\n]%*c", name); 
-    name[strcspn(name, "\n")] = '\0';
+
+    fgets(name, 30, stdin);
+    name[strcspn(name, "\n")] = 0;
 
     if(strlen(name) < 3) {
         printf("\n>> Error << Name must be at least 3 characters long\n");
@@ -121,7 +126,9 @@ int register_procedure() {
     
     char email[30];
     printf("Enter your email (max. 30 characters): ");
-    scanf("%s", email);
+
+    fgets(email, 30, stdin);
+    email[strcspn(email, "\n")] = 0;
 
     if(strlen(email) < 3 || strlen(email) > 30) {
         printf("\n>> Error << Email must be 3-30 characters long\n");
@@ -147,7 +154,9 @@ int register_procedure() {
 
     char username[30];
     printf("Enter your username (max. 30 characters, no spaces): ");
-    scanf("%s", username);
+
+    fgets(username, 30, stdin);
+    username[strcspn(username, "\n")] = 0;
 
     if(strlen(username) < 3 || strlen(username) > 30) {
         printf("\n>> Error << Username must be 3-30 characters long\n");
@@ -161,13 +170,15 @@ int register_procedure() {
 
     if(username_exists(username)) {
         printf("\n>> Error << User \"%s\" already exists!\n", username);
+        return(1);
     }
 
     /* --- Password --- */
 
     char password[30];
     printf("Enter your password (max. 30 characters, no spaces): ");
-    scanf("%s", password);
+    fgets(password, 30, stdin);
+    password[strcspn(password, "\n")] = 0;
     
     if(strlen(password) < 3 || strlen(password) > 30) {
         printf("\n>> Error << Password must be 3-30 characters long\n");

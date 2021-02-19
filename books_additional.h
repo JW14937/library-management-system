@@ -6,6 +6,11 @@ struct Loan {
     char* book_title;
 };
 
+extern struct Book books[max_books];
+extern struct Loan loans[max_loans];
+extern int nr_of_books;
+extern int nr_of_loans;
+
 int load_loans(FILE *fp);
 int store_loans(FILE *fp);
 
@@ -13,7 +18,7 @@ void search_procedure(); //Search interface
 
 int borrow(struct Book book, int user_id);
 
-int find_id_by_title(char title[]);
+int find_id_by_title(char title[]); //Returns id of the book with given title, or -1 if none were found
 
 void return_procedure(); //Return interface
 int return_book(struct Book book);
