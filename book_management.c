@@ -5,38 +5,54 @@
 #include <string.h>
 #include <ctype.h>
 
-struct Book books[max_books];
-struct Loan loans[max_loans];
-int nr_of_books;
-int nr_of_loans;
+/* ---------- 
+        This file contains functions related to managing books 
+        General descriptions of all functions in header files       ---------- */
+
+
+struct Book books[max_books]; // Array of all titles in the library
+struct Loan loans[max_loans]; // Array of all active loans
+int nr_of_books; // Counting all titles in the library
+int nr_of_loans; // Counting all active loans
 
 /* --- Save and load functions --- */
 
 int load_books(FILE *file) {
 
-    nr_of_books = 0;
+    nr_of_books = 0; // Zero it out, in case of reload
 
     file = fopen("books.txt", "r");
     if(file == NULL) return 1;
     
     char line[100];
 
+    // Reading books.txt line by line
     while(fgets(line, 100, file) != NULL) {
-        line[strcspn(line, "\n")] = 0;
-        static int i = 1;
 
+        line[strcspn(line, "\n")] = 0;
+        static int i = 1; // Used to distinguish between lines containing different data
+
+        // Title line
         if(i == 1) {
             books[nr_of_books].title = (char*)malloc(strlen(line) * sizeof(char));
             strcpy(books[nr_of_books].title, line);
         }
+
+        // Authors line
         else if(i == 2) {
             books[nr_of_books].authors = (char*)malloc(strlen(line) * sizeof(char));
             strcpy(books[nr_of_books].authors, line);
         }
+
+        // Year published line
         else if(i == 3) books[nr_of_books].year = atoi(line);
+
+        // Nr of available copies line
         else if(i == 4) books[nr_of_books].copies = atoi(line);
         
         i += 1;
+
+        // Reset the line data counter, once all data for 1 book has been read
         if(i > 4) {
             i = 1;
             nr_of_books += 1;
@@ -76,30 +92,32 @@ int store_books(FILE *file) {
 
 int load_loans(FILE *file) {
 
-    nr_of_loans = 0;
+    nr_of_loans = 0; // Zero it out, in case of reload
 
     file = fopen("loans.txt", "r");
     if(file == NULL) return 1;
 
     char line[100];
 
+    // Read loans.txt line by line
     while(fgets(line, 100, file) != NULL) {
+        
         line[strcspn(line, "\n")] = 0;
-        static int i = 1;
+        static int i = 1; // Used to distinguish between lines containing different data
 
-        //UserID line
+        // UserID line
         if(i == 1) {
             loans[nr_of_loans].user_id = atoi(line);
-            i = 0;
+            i = 0; // Next line contains book title
         }
 
-        //Book title line
+        // Book title line
         else if(i == 0) {
             loans[nr_of_loans].book_title = (char*)malloc(strlen(line) * sizeof(char));
             strcpy(loans[nr_of_loans].book_title, line);
             
-            i = 1;
-            nr_of_loans++;
+            i = 1; // Next line contains UserID of next loan
+            nr_of_loans++; // All data read for 1 loan
         }
     }
 
@@ -113,7 +131,7 @@ int store_loans(FILE* file) {
 
     for(int i=0; i<nr_of_loans; i++) {
 
-        // Don't save returned books
+        // Loan marked returned - don't save
         if(loans[i].user_id == -1) { 
             free(loans[i].book_title);
             continue; 
@@ -131,7 +149,7 @@ int store_loans(FILE* file) {
 
 /* --- Search functions --- */
 
-struct Book found_books_array[max_books];
+struct Book found_books_array[max_books]; // Array used to store found books
 
 struct BookArray find_book_by_title (const char *title) {
     
@@ -146,6 +164,7 @@ struct BookArray find_book_by_title (const char *title) {
         else search_title_lcase[i] = title[i];
     }
 
+    // Look for the search terms inside titles of all books
     for(int i=0; i<nr_of_books; i++) {
 
         // Turn compare title into lowercase
@@ -156,8 +175,10 @@ struct BookArray find_book_by_title (const char *title) {
         }
 
         if(strstr(full_title_lcase, search_title_lcase) != NULL) {
+
+            // Search terms found inside the title of this book with index i
             found_books_array[found_books.length] = books[i];
-            found_books.length ++;
+            found_books.length++;
         }
     }
     
@@ -177,6 +198,7 @@ struct BookArray find_book_by_author (const char *author) {
         else search_author_lcase[i] = author[i];
     }
 
+    // Look for the search terms inside authors of all books
     for(int i=0; i<nr_of_books; i++) {
 
         // Turn compare author into lowercase
@@ -187,6 +209,8 @@ struct BookArray find_book_by_author (const char *author) {
         }
 
         if(strstr(full_author_lcase, search_author_lcase) != NULL) {
+
+            // Search terms found inside authors of this book with index i
             found_books_array[found_books.length] = books[i];
             found_books.length ++;
         }
@@ -201,25 +225,30 @@ struct BookArray find_book_by_year (unsigned int year) {
     found_books.array = found_books_array;
     found_books.length = 0;
 
+    // Find all books where year exactly matches search year
     for(int i=0; i<nr_of_books; i++) {
         if(books[i].year == year) {
             found_books_array[found_books.length] = books[i];
-            found_books.length ++;
+            found_books.length++;
         }
     }
 
     return found_books;
 }
 
+// The interface to search for books with option of borrowing
 void search_procedure() {
 
     struct BookArray found_books;
+
+    // 3 options of search
 
     printf("\nType \"title\" to search by TITLE, \"author\" to search by AUTHOR, \"year\" to search by YEAR: ");
     char search_option[20];
     fgets(search_option, 20, stdin);
     search_option[strcspn(search_option, "\n")] = 0;
     
+    // Search by title
     if(strcmp(search_option, "title")==0) {
         char search_terms[50];
         printf("\nEnter search term(s): ");
@@ -229,6 +258,8 @@ void search_procedure() {
         
         found_books = find_book_by_title(search_terms);
     }
+
+    // Search by author
     else if(strcmp(search_option, "author")==0) {
         char search_terms[50];
         printf("\nEnter search term(s): ");
@@ -236,13 +267,16 @@ void search_procedure() {
         fgets(search_terms, 50, stdin);
         search_terms[strcspn(search_terms, "\n")] = 0;
 
+        // Check for valid user input
         if(only_digits(search_terms) == 1) {
-            printf("\n>> Error << Author field cannot contain only digits\n");
+            printf("\n>> Error << Author field cannot only contain digits\n");
             return;
         }
 
         found_books = find_book_by_author(search_terms);
     }
+
+    // Search by year
     else if(strcmp(search_option, "year")==0) {
         char search_year_str[6];
         printf("\nEnter search year (digits only): ");
@@ -250,6 +284,7 @@ void search_procedure() {
         fgets(search_year_str, 6, stdin);
         search_year_str[strcspn(search_year_str, "\n")] = 0;
 
+        // Check for valid user input
         if(!only_digits(search_year_str)) {
             printf("\n>> Error << Year can only contain digits\n");
             return;
@@ -263,28 +298,23 @@ void search_procedure() {
         }
         found_books = find_book_by_year(search_year);
     }
+
+    // Invalid user input for option
     else {
         printf("\n>> Error << Option not recognised\n");
         return;
     }
 
-    // Count nr of books that are actually available = have nr of available copies > 0
-    int actually_available = 0;
-    for(int i=0; i<found_books.length; i++) {
-        if((*(found_books.array+i)).copies > 0) { 
-            actually_available++; 
-        }
-    }
-
-    if(actually_available==0) {
+    // No books found
+    if(found_books.length == 0) {
         printf("\n--- No results match your search ---\n");
         return;
     }
 
-    printf("\n--- %d search result(s) found: ---\n", actually_available);
+    // Books found
+    printf("\n--- %d search result(s) found: ---\n", found_books.length);
 
     for(int i=0; i<found_books.length; i++) {
-        if((*(found_books.array+i)).copies < 1) { continue; } // Don't show books with no available copies
         printf("\nResult #%d: \n", i+1);
         printf("Title: %s\n", (*(found_books.array+i)).title);
         printf("Author(s): %s\n", (*(found_books.array+i)).authors);
@@ -292,7 +322,9 @@ void search_procedure() {
         printf("Copies available: %d\n", (*(found_books.array+i)).copies);
     }
 
-    if(actually_available > 1) { printf("\nWould you like to borrow one of these books? (y/n) "); }
+    // Option to borrow
+
+    if(found_books.length > 1) { printf("\nWould you like to borrow one of these books? (y/n) "); }
     else { printf("\nWould you like to borrow this book? (y/n) "); }
     char answer = get_char_input();
 
@@ -300,13 +332,15 @@ void search_procedure() {
 
         int result_nr = 1;
 
-        if(actually_available > 1) {
+        // Pick one of the found results to borrow
+        if(found_books.length > 1) {
             printf("\nWhich of the results would you like to borrow? Please type the number (without #): ");
             result_nr = get_nr_input();
         }
         
+        // Check for valid user input
         if(result_nr > 0 && result_nr <= found_books.length) {
-            int error_code = borrow(found_books_array[result_nr-1], current_user_id);
+            int error_code = borrow(found_books_array[result_nr-1]); // Send to borrow function
 
             if(error_code == 0) { printf("\n\n--- You have borrowed \"%s\" ---\n", found_books_array[result_nr-1].title); }
             else { printf("\nCouldn't borrow %s\n", found_books_array[result_nr-1].title); }
@@ -320,8 +354,9 @@ void search_procedure() {
 
 /* --- Standard user functions: borrow and return --- */
 
-int borrow(struct Book book, int user_id) {
+static int borrow(struct Book book) {
 
+    // Checks if possible to borrow this book
     if(book.copies < 1) {
         printf("\n>> Error << Sorry, no copies currently available! Try again later\n");
         return 1;
@@ -332,13 +367,15 @@ int borrow(struct Book book, int user_id) {
         return 1;
     }
 
+    // Passed the checks
     int book_id = find_id_by_title(book.title);
     if(book_id < 0) {
         printf("\n>> Error << Book id not found\n");
         return 1;
     }
-    books[book_id].copies -= 1;
+    books[book_id].copies--;
 
+    // Add a new loan
     loans[nr_of_loans].book_title = (char*)malloc(strlen(book.title) * sizeof(char));
     strcpy(loans[nr_of_loans].book_title, book.title);
     loans[nr_of_loans].user_id = current_user_id;
@@ -347,7 +384,10 @@ int borrow(struct Book book, int user_id) {
     return 0;
 }
 
+// The interface to see borrowed books with option of returning
 void return_procedure() {
+
+    // Print out all books borrowed by this user
 
     int book_ids[nr_of_books]; // Array of ID numbers of found books
     int nr_books_found = 0;
@@ -373,6 +413,9 @@ void return_procedure() {
         printf("Year published: %d\n", books[book_ids[i]].year);
     }
 
+
+    // Option of returning 1 of the borrowed books
+
     if(nr_books_found > 1) { printf("\nWould you like to return one of these books? (y/n) "); }
     else { printf("\nWould you like to return this book? (y/n) "); }
     char answer = get_char_input();
@@ -382,12 +425,14 @@ void return_procedure() {
         int result_nr = 1;
 
         if(nr_books_found > 1) {
+            // Pick one of the found results to borrow
             printf("\nWhich of the results would you like to return? Please type the number (without #): ");
             result_nr = get_nr_input();
         }
         
+        // Check validity of user input
         if(result_nr > 0 && result_nr <= nr_books_found) {
-            int error_code = return_book(books[book_ids[result_nr-1]]);
+            int error_code = return_book(books[book_ids[result_nr-1]]); // Send to return_book function
             if(error_code==0) { printf("\n--- You have successfully returned \"%s\"! ---\n", books[book_ids[result_nr-1]].title); }
             else { printf("\n>> Error << Error returning book\n"); }
         }
@@ -395,18 +440,22 @@ void return_procedure() {
     }
 }
 
-int return_book(struct Book book) {
+static int return_book(struct Book book) {
 
     for(int i=0; i<nr_of_loans; i++) {
+
         if(loans[i].user_id == current_user_id) {
+
             if(strcmp(loans[i].book_title, book.title) == 0) {
-                loans[i].user_id = -1;
-                books[find_id_by_title(loans[i].book_title)].copies ++;
-                break;
+
+                loans[i].user_id = -1; // Mark for deletion for the next time store_loans runs
+                books[find_id_by_title(loans[i].book_title)].copies++;
+                break; // Only return 1 copy
             }
         }
     }
 
+    // Reload the loans to remove the returned book
     FILE *fp;
     store_loans(fp);
     load_loans(fp);
@@ -417,7 +466,9 @@ int return_book(struct Book book) {
 
 /* --- Librarian functions: add and remove --- */
 
+// The interface to pick between 2 options
 void add_procedure() {
+
     printf("\nWould you like to (1) add new copies to an existing title, or (2) add a new title?");
     printf("\nYour choice (type \"1\" or \"2\"): ");
 
@@ -428,7 +479,10 @@ void add_procedure() {
     else { printf("\n>> Error << You were supposed to type either \"1\" or \"2\"\n"); }
 }
 
-void add_more_copies() {
+static void add_more_copies() {
+
+    // First, find the right book
+
     printf("\nWhich book do you want to add copies to? Search by title: ");
 
     char search_terms[50];
@@ -450,6 +504,8 @@ void add_more_copies() {
         printf("\nAvailable copies: %d", (*(found_books.array+i)).copies);
     }
 
+    // Now, option of adding more copies
+
     if(found_books.length > 1) { printf("\n\nWould you like to add more copies of one of these books? (y/n) "); }
     else { printf("\n\nWould you like to add more copies of this book? (y/n) "); }
     char answer = get_char_input();
@@ -463,10 +519,17 @@ void add_more_copies() {
             result_nr = get_nr_input();
         }
         
+        // Check for validity of user input
         if(result_nr > 0 && result_nr <= found_books.length) {
-            int nr_copies = 0;
+            
             printf("\nEnter the number of copies to add: ");
-            nr_copies = get_nr_input();
+            int nr_copies = get_nr_input();
+            if(nr_copies < 1) {
+                printf("\n>> Error << Invalid input for nr of copies - must be >0\n");
+                return;
+            }
+
+            // Increase the nr of copies
             books[find_id_by_title(found_books_array[result_nr-1].title)].copies += nr_copies;
             printf("\n--- Added %d more copies of \"%s\" ---\n", nr_copies, found_books_array[result_nr-1].title);
         }
@@ -475,8 +538,10 @@ void add_more_copies() {
 
 }
 
-void add_new_book() {
+// The interface of adding a new book
+static void add_new_book() {
 
+    // Title
     char title[50];
     printf("\nEnter the title of the new book (max 50 characters): ");
 
@@ -492,6 +557,7 @@ void add_new_book() {
         return;
     }
 
+    // Authors
     char authors[100];
     printf("\nEnter the author(s) of the new book (max 100 characters): ");
 
@@ -503,22 +569,25 @@ void add_new_book() {
         return;
     }
 
+    // Year
     printf("\nEnter the year the book was published: ");
     int year = get_nr_input();
 
-    if(year < 0 || year > 2021) {
-        printf("\n>> Error << Invalid year - must be between 0 and 2021\n");
+    if(year < 0 || year > 2050) {
+        printf("\n>> Error << Invalid year - must be between 0 and 2050\n");
         return;
     }
 
+    // Copies available
     printf("\nEnter the number of copies available (max. 999): ");
     int nr_copies = get_nr_input();
 
-    if(nr_copies < 0) {
-        printf("\n>> Error << Invalid number of copies - must be >= 0\n");
+    if(nr_copies < 0 || nr_copies > 999) {
+        printf("\n>> Error << Invalid number of copies - must be between 0 and 999\n");
         return;
     }
 
+    // Passed all the checks
     struct Book new_book;
     new_book.title = title;
     new_book.authors = authors;
@@ -526,11 +595,16 @@ void add_new_book() {
     new_book.copies = nr_copies;
 
     if(add_book(new_book) == 0) { printf("\n--- You have added \"%s\" to the library! ---\n", new_book.title); }
-    else { printf("\n>> Error << Book could not be added\n"); }
+    else { printf("\n>> Error << Book could not be added.\n"); }
 
 }
 
 int add_book(struct Book book) {
+
+    if(nr_of_books >= max_books) { 
+        printf("\nThe maximum capacity of the library has been reached\n");
+        return 1; 
+    }
 
     books[nr_of_books].title = (char*)malloc(strlen(book.title) * sizeof(char));
     strcpy(books[nr_of_books].title, book.title);
@@ -544,22 +618,23 @@ int add_book(struct Book book) {
     return 0;
 }
 
+// The interface to remove a book from the library
 void remove_procedure() {
 
-    int book_id;
-
+    // Exact title
     printf("\nWhich book do you want to remove? Enter the exact title: ");
     char title[50];
     fgets(title, 50, stdin);
     title[strcspn(title, "\n")] = 0;
 
-    book_id = find_id_by_title(title);
+    int book_id = find_id_by_title(title);
 
     if(book_id == -1) {
         printf("\n>> Error << Book with this exact title doesn't exist\n");
         return;
     }
 
+    // Exact author
     printf("Enter the exact author: ");
     char author[100];
     fgets(author, 100, stdin);
@@ -570,6 +645,7 @@ void remove_procedure() {
         return;
     }
 
+    // Exact year
     printf("Enter the year book was published: ");
     int year = get_nr_input();
 
@@ -583,69 +659,27 @@ void remove_procedure() {
         return;
     }
     
+    // Passed all the checks - send to remove_book function
     if(remove_book(books[book_id])==0) {
         printf("\n--- You have removed %s ---\n", title);
     }
+
+    else { printf("\n>> Error << There was a problem removing the book\n"); }
 }
 
 int remove_book(struct Book book) {
 
     books[find_id_by_title(book.title)].year = 9999; // Mark title to be deleted with next save
+
+    // Reload books to update the books array
     FILE *fp;
-    store_books(fp);
-    load_books(fp);
+    if(store_books(fp) != 0) { return 1; }
+    if(load_books(fp) != 0) { return 1; }
 
     return 0;
 }
 
 /* --- Utilities --- */
-
-int title_exists(char title[]) {
-
-    for(int i=0; i<nr_of_books; i++) {
-        if(strcmp(title, books[i].title) == 0) { return 1; }
-    }
-
-    return 0;
-}
-
-int find_id_by_title (char title[]) {
-
-    for(int i=0; i<nr_of_books; i++) {
-        if(strcmp(books[i].title, title)==0) return i;
-    }
-
-    return -1;
-}
-
-int only_digits(char title[]) {
-
-    for(int i=0; i<strlen(title); i++) {
-        if(isdigit(title[i]) == 0) { return 0; }
-    }
-
-    return 1;
-}
-
-int nr_copies_borrowed(char title[]) {
-
-    int count = 0;
-
-    for(int i=0; i<nr_of_loans; i++) {
-        if(loans[i].user_id == current_user_id && strcmp(loans[i].book_title, title)==0) { count++; }
-    }
-
-    return count;
-}
-
-int is_borrowed(struct Book book) {
-
-    for(int i=0; i<nr_of_loans; i++) {
-        if(strcmp(book.title, loans[i].book_title)==0) { return 1; }
-    }
-
-    return 0;
-}
 
 int get_nr_input() {
 
@@ -663,4 +697,51 @@ char get_char_input() {
     getchar(); // Clear the buffer
     
     return input;
+}
+
+int only_digits(const char * title) {
+
+    for(int i=0; i<strlen(title); i++) {
+        if(isdigit(title[i]) == 0) { return 0; }
+    }
+
+    return 1;
+}
+
+static int title_exists(const char * title) {
+
+    for(int i=0; i<nr_of_books; i++) {
+        if(strcmp(title, books[i].title) == 0) { return 1; }
+    }
+
+    return 0;
+}
+
+static int find_id_by_title (const char * title) {
+
+    for(int i=0; i<nr_of_books; i++) {
+        if(strcmp(books[i].title, title)==0) return i;
+    }
+
+    return -1;
+}
+
+static int nr_copies_borrowed(const char * title) {
+
+    int count = 0;
+
+    for(int i=0; i<nr_of_loans; i++) {
+        if(loans[i].user_id == current_user_id && strcmp(loans[i].book_title, title)==0) { count++; }
+    }
+
+    return count;
+}
+
+static int is_borrowed(struct Book book) {
+
+    for(int i=0; i<nr_of_loans; i++) {
+        if(strcmp(book.title, loans[i].book_title)==0) { return 1; }
+    }
+
+    return 0;
 }

@@ -4,7 +4,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-int current_user_id;
+/* ---------- 
+                This file contains the main interface ---------- */
+
+
+int current_user_id; // ID of user currently logged in
 
 static void print_welcome_message() {
     printf("\n**************************************\n");
@@ -18,7 +22,7 @@ int main() {
 
     if(load_users(fp) != 0) {
 
-        // File not created yet - add admin account
+        // File not created yet - add admin account to user array (created in user_management.c)
 
         users[0].id = 0;
         users[0].is_librarian = 1;
@@ -36,9 +40,9 @@ int main() {
 
     if(load_books(fp) != 0) {
 
-        // File not created yet - add starter books
+        // File not created yet - add starter books to books array (created in book_management.c)
 
-        // Crime and Punishment
+        // Book nr 1
         books[0].title = (char*)malloc(strlen("Crime and Punishment") * sizeof(char));
         strcpy(books[0].title, "Crime and Punishment");
         books[0].authors = (char*)malloc(strlen("Fyodor Dostoevsky") * sizeof(char));
@@ -46,7 +50,7 @@ int main() {
         books[0].year = 1866;
         books[0].copies = 15;
 
-        // Dune
+        // Book nr 2
         books[1].title = (char*)malloc(strlen("Dune") * sizeof(char));
         strcpy(books[1].title, "Dune");
         books[1].authors = (char*)malloc(strlen("Frank Herbert") * sizeof(char));
@@ -61,7 +65,7 @@ int main() {
 
     print_welcome_message();
 
-    int logged_in = 0;
+    static int logged_in = 0; // 0 if no user logged in, 1 once a user logs in
     char user_command[20];
 
     /* --- The interface --- */
@@ -114,6 +118,7 @@ int main() {
             printf("\n-> To SEARCH and then BORROW books, type \"search\"\n");
             printf("-> To see BORROWED books and RETURN them, type \"borrowed\"\n");
 
+            // 2 librarian functions: add and remove
             if(users[current_user_id].is_librarian) {
                 printf("-> To ADD books to the library, type \"add\"\n");
                 printf("-> To REMOVE books from the library, type \"remove\"\n");
@@ -141,6 +146,9 @@ int main() {
             }
 
             else if(strcmp(user_command, "q")==0) {
+
+                // No point checking for errors, because the user wants to quit anyway
+                //   - better to have some things saved, than none if user force quits
                 store_books(fp);
                 store_loans(fp);
                 store_users(fp);

@@ -3,8 +3,12 @@
 #include <string.h>
 #include <ctype.h>
 
-struct User users[max_users];
-int nr_of_users = 0;
+/* ---------- 
+        This file contains functions related to managing users 
+        General descriptions of all functions in the header file       ---------- */
+
+struct User users[max_users]; // Array of all users
+int nr_of_users = 0; // Number of all users
 
 /* --- Load and store --- */
 
@@ -17,30 +21,45 @@ int load_users (FILE *file) {
 
     char line[100];
 
+    // Read line by line from account_data.txt
     while(fgets(line, 100, file) != NULL) {
-        line[strcspn(line, "\n")] = 0;
-        static int i = 1;
 
+        line[strcspn(line, "\n")] = 0;
+        static int i = 1; // Counter to distinguish between lines containing different data
+
+        // UserID line
         if(i == 1) users[nr_of_users].id = atoi(line);
+
+        // Line indicating whether user is librarian (1) or not (0)
         else if(i == 2) users[nr_of_users].is_librarian = atoi(line);
+
+        // Name line
         else if(i == 3) {
             users[nr_of_users].name = (char*)malloc(strlen(line) * sizeof(char));
             strcpy(users[nr_of_users].name, line);
         }
+
+        // Email line
         else if(i == 4) {
             users[nr_of_users].email = (char*)malloc(strlen(line) * sizeof(char));
             strcpy(users[nr_of_users].email, line);
         }
+
+        // Username line
         else if(i == 5) {
             users[nr_of_users].username = (char*)malloc(strlen(line) * sizeof(char));
             strcpy(users[nr_of_users].username, line);
         }
+
+        // Password line
         else if(i == 6) {
             users[nr_of_users].password = (char*)malloc(strlen(line) * sizeof(char));
             strcpy(users[nr_of_users].password, line);
         }
         
         i += 1;
+
+        // Reset the counter - read all data of 1 user
         if(i > 6) {
             i = 1;
             nr_of_users += 1;
@@ -79,6 +98,8 @@ int store_users(FILE* file) {
 /* --- Login and registration --- */
 
 int login_procedure() {
+
+    // Username
     char username[30];
     printf("\nEnter username: ");
 
@@ -92,32 +113,37 @@ int login_procedure() {
         return 1;
     }
 
+    // Password
     char password[30];
     printf("Enter password: ");
     fgets(password, 30, stdin);
     password[strcspn(password, "\n")] = 0;
 
+    // Check if password correct
     if(compare_password(user_id, password) != 0) {
         printf("\n>> Error << Wrong password!\n");
         return 1;
     }
 
+    // Login successful
     current_user_id = user_id;
     return 0;
 }
 
-int find_username(char username[30]) {
+// Returns UserID for this username, -1 if none found
+static int find_username(const char *username) {
     for(int i=0; i<nr_of_users; i++) {
         if(strcmp(users[i].username, username)==0) return users[i].id;
     }
     return -1;
 }
 
-int compare_password(int user_id, char password[30]) {
+static int compare_password(int user_id, const char *password) {
     if(strcmp(users[user_id].password, password)==0) return 0;
     else return 1;
 }
 
+// Interface to register
 int register_procedure() {
 
     if(nr_of_users >= max_users) {
@@ -125,7 +151,7 @@ int register_procedure() {
         return(1);
     }
 
-    /* --- Name --- */
+    // Name
 
     char name[30];
     printf("\nEnter your name (max. 30 characters): ");
@@ -143,7 +169,7 @@ int register_procedure() {
         return(1);
     }
 
-    /* --- Email --- */
+    // Email
     
     char email[30];
     printf("Enter your email (max. 30 characters): ");
@@ -171,7 +197,7 @@ int register_procedure() {
         return(1);
     }
 
-    /* --- Username --- */
+    // Username
 
     char username[30];
     printf("Enter your username (max. 30 characters, no spaces): ");
@@ -194,7 +220,7 @@ int register_procedure() {
         return(1);
     }
 
-    /* --- Password --- */
+    // Password
 
     char password[30];
     printf("Enter your password (max. 30 characters, no spaces): ");
@@ -211,13 +237,17 @@ int register_procedure() {
         return(1);
     }
 
-    /* --- Add to array --- */
+    // All checks passed - add new user to user array
 
     users[nr_of_users].id = nr_of_users;
     users[nr_of_users].is_librarian = 0;
+    users[nr_of_users].name = (char*)malloc(strlen(name) * sizeof(char));
     strcpy(users[nr_of_users].name, name);
+    users[nr_of_users].email = (char*)malloc(strlen(email) * sizeof(char));
     strcpy(users[nr_of_users].email, email);
+    users[nr_of_users].username = (char*)malloc(strlen(username) * sizeof(char));
     strcpy(users[nr_of_users].username, username);
+    users[nr_of_users].password = (char*)malloc(strlen(password) * sizeof(char));
     strcpy(users[nr_of_users].password, password);
 
     nr_of_users++;
@@ -225,23 +255,24 @@ int register_procedure() {
     return 0;
 }
 
+
 /* --- Utilities --- */
 
-int email_exists(char text[50]) {
+int email_exists(const char *text) {
     for(int i=0; i<nr_of_users; i++) {
         if(strcmp(text, users[i].email) == 0) { return 1; }
     }
     return 0;
 }
 
-int username_exists (char text[50]) {
+int username_exists (const char *text) {
     for(int i=0; i<nr_of_users; i++) {
         if(strcmp(text, users[i].username) == 0) { return 1; }
     }
     return 0;
 }
 
-int only_letters_spaces (char text[50]) {
+int only_letters_spaces (const char *text) {
     for(int i=0; i<strlen(text); i++) {
         if(!(isalpha(text[i]) || text[i] == ' ')) {
             return 0;
@@ -251,7 +282,7 @@ int only_letters_spaces (char text[50]) {
     return 1;
 }
 
-int no_spaces (char text[50]) {
+int no_spaces (const char *text) {
     for(int i=0; i<strlen(text); i++) {
         if(text[i] == ' ') {
             return 0;
@@ -261,7 +292,7 @@ int no_spaces (char text[50]) {
     return 1;
 }
 
-int at_counter (char text[50]) {
+int at_counter (const char *text) {
     int counter = 0;
     for(int i=0; i<strlen(text); i++) {
         if(text[i] == '@') counter++;
