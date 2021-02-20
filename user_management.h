@@ -4,10 +4,10 @@
 struct User {
         int id;
         int is_librarian;
-		char name[30];
-		char email[30];
-        char username[30];
-        char password[30];
+		char *name;
+		char *email;
+        char *username;
+        char *password;
 };
 
 extern struct User users[max_users];

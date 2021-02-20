@@ -1,6 +1,6 @@
 #include "book_management.h"
 #include "user_management.h"
-#include "books_additional.h"
+#include "book_additional.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -8,7 +8,7 @@ int current_user_id;
 
 static void print_welcome_message() {
     printf("\n**************************************\n");
-    printf("  ~  Welcome to the library system  ~  \n");
+    printf("  --  Welcome to the library system  --  \n");
     printf("**************************************\n");
 }
 
@@ -22,9 +22,13 @@ int main() {
 
         users[0].id = 0;
         users[0].is_librarian = 1;
+        users[0].name = (char*)malloc(strlen("Janine Hopkins") * sizeof(char));
         strcpy(users[0].name, "Janine Hopkins");
+        users[0].email = (char*)malloc(strlen("janine_hopkins@library.co.uk") * sizeof(char));
         strcpy(users[0].email, "janine_hopkins@library.co.uk");
+        users[0].username = (char*)malloc(strlen("librarian1") * sizeof(char));
         strcpy(users[0].username, "librarian1");
+        users[0].password = (char*)malloc(strlen("Password123") * sizeof(char));
         strcpy(users[0].password, "Password123");
 
         nr_of_users = 1;
@@ -75,15 +79,17 @@ int main() {
             user_command[strcspn(user_command, "\n")] = 0;
 
             if(strcmp(user_command, "login")==0) {
+
                 if(login_procedure() == 0) {
                     logged_in = 1;
                     printf("\n\n******************************\n");
-                    printf("  Hello, %s!\n", &(users[current_user_id].name));
+                    printf("  Hello, %s!\n", users[current_user_id].name);
                     printf("******************************\n");
                 }
             }
 
             else if(strcmp(user_command, "register")==0) {
+
                 if(register_procedure() == 0) {
                     printf("\n******************************************");
                     printf("\nRegistration successful! You may now log in.");
@@ -113,7 +119,7 @@ int main() {
                 printf("-> To REMOVE books from the library, type \"remove\"\n");
             }
 
-            printf("-> To LOG OUT and SAVE, type \"out\"\n");
+            printf("-> To SAVE and QUIT, type \"q\"\n");
 
             fgets(user_command, 20, stdin);
             user_command[strcspn(user_command, "\n")] = 0;
@@ -134,14 +140,13 @@ int main() {
                 remove_procedure();
             }
 
-            else if(strcmp(user_command, "out")==0) {
-                //check for errors
+            else if(strcmp(user_command, "q")==0) {
                 store_books(fp);
                 store_loans(fp);
                 store_users(fp);
 
-                logged_in = 0;
-                current_user_id = -1;
+                printf("\nThank you for using the system. Goodbye!\n");
+                exit(0);
             }
 
             else {

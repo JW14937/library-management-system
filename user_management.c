@@ -6,6 +6,8 @@
 struct User users[max_users];
 int nr_of_users = 0;
 
+/* --- Load and store --- */
+
 int load_users (FILE *file) {
 
     nr_of_users = 0;
@@ -21,10 +23,22 @@ int load_users (FILE *file) {
 
         if(i == 1) users[nr_of_users].id = atoi(line);
         else if(i == 2) users[nr_of_users].is_librarian = atoi(line);
-        else if(i == 3) strcpy(users[nr_of_users].name, line);
-        else if(i == 4) strcpy(users[nr_of_users].email, line);
-        else if(i == 5) strcpy(users[nr_of_users].username, line);
-        else if(i == 6) strcpy(users[nr_of_users].password, line);
+        else if(i == 3) {
+            users[nr_of_users].name = (char*)malloc(strlen(line) * sizeof(char));
+            strcpy(users[nr_of_users].name, line);
+        }
+        else if(i == 4) {
+            users[nr_of_users].email = (char*)malloc(strlen(line) * sizeof(char));
+            strcpy(users[nr_of_users].email, line);
+        }
+        else if(i == 5) {
+            users[nr_of_users].username = (char*)malloc(strlen(line) * sizeof(char));
+            strcpy(users[nr_of_users].username, line);
+        }
+        else if(i == 6) {
+            users[nr_of_users].password = (char*)malloc(strlen(line) * sizeof(char));
+            strcpy(users[nr_of_users].password, line);
+        }
         
         i += 1;
         if(i > 6) {
@@ -50,12 +64,19 @@ int store_users(FILE* file) {
         fprintf(file, "%s\n", users[i].email);
         fprintf(file, "%s\n", users[i].username);
         fprintf(file, "%s\n", users[i].password);
+
+        free(users[i].name);
+        free(users[i].email);
+        free(users[i].username);
+        free(users[i].password);
     }
 
     fclose(file);
 
     return 0;
 }
+
+/* --- Login and registration --- */
 
 int login_procedure() {
     char username[30];
@@ -72,7 +93,7 @@ int login_procedure() {
     }
 
     char password[30];
-    printf("\nEnter password: ");
+    printf("Enter password: ");
     fgets(password, 30, stdin);
     password[strcspn(password, "\n")] = 0;
 
@@ -203,6 +224,8 @@ int register_procedure() {
 
     return 0;
 }
+
+/* --- Utilities --- */
 
 int email_exists(char text[50]) {
     for(int i=0; i<nr_of_users; i++) {
